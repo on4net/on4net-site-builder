@@ -110,6 +110,20 @@ and `render_page` is how you check it.
 | `[gl-chart-donut]` | A donut of the values of one field. | `table`, `field`, `limit` |
 | `[gl-chart-stat]` | One number: a count, a sum or an average. | `table`, `metric` (`rows`/`sum`/`average`), `field`, `label`, `suffix` |
 
+## Questions and answers
+
+The owner answers questions in the panel; these draw the answered ones. They are rows, not markup, so an answer written once
+appears on every page that shows its list - and a page with `[gl-faq]` carries `FAQPage` structured data that search engines
+and answer engines read. Nobody gains answers by writing markup: the owner adds them in the panel.
+
+| Code | What it does | Parameters worth knowing |
+|---|---|---|
+| `[gl-faq]` | The site's published questions and answers in the page's language, each fold-out, with a helpful / not helpful button. | `group` (the list to show, default `general`), `title`, `limit` (default 50, at most 200), `open` (`yes` shows every answer open) |
+| `[gl-faq-ask]` | The form a visitor asks a new question with (name, email, question). It mails a confirmation link and stores nothing public until the owner answers. | `group` (the list the answer joins, default `general`), `title`, `button` |
+
+A question nobody has answered yet appears only to the owner in the panel - so a page with `[gl-faq]` and no answers shows its
+heading and nothing under it. Put `[gl-faq-ask]` below the list, or on a contact page.
+
 ## Commerce and plans
 
 Only when the owner has set them up; ask before using.
@@ -127,7 +141,7 @@ Only when the owner has set them up; ask before using.
 | Code | What it does |
 |---|---|
 | `[gl-cursor]` | A custom cursor dot that follows the pointer. |
-| `[gl-network]` | A particle-network background on a canvas (`count`, `distance`). Costs CPU: leave it out on content-heavy pages. |
+| `[gl-network]` | A particle-network background on a canvas (`count`, `distance`, `z`). Costs CPU: leave it out on content-heavy pages. `z` is the layer the canvas sits on: `-1` never draws over the content, `0` (default) is the background a theme's `main`/footer stack above, and `20` shows the particles over sections that paint their own opaque background — the usual reason it seems not to appear in a theme you wrote yourself. |
 | `[gl-anim]` | Turns on the entrance animations for the elements that ask for them. |
 
 Prefer a built-in over writing the same markup: it follows the site's branding and works on the designer's canvas.

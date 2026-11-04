@@ -64,12 +64,15 @@ set_menu_items {menuId, items: [
 - Keep a main menu to 4-7 entries; put the rest in a footer menu (`slug: "footer"`).
 - A menu with language `all` is shared by every language - only for entries whose labels are the same in each.
 - The menu's `slug` is part of the shortcode: change it and every `[gl-menu-main]` that names it renders nothing.
+- A menu for the customer panel: an entry pointing at a panel page must carry the `/dashboard/...` address as its `url`, because a
+  `PAGE` entry resolves to the public address. The same menu in a public page is visible to visitors.
 
 ## Media
 
 ```
 upload_media {sourceUrl: "https://…/photo.jpg", folder: "team", optimize: true}   → { url: "/uploads/…" }
 create_upload_link {folder: "team"}   → { url } — for a file on the PERSON's computer: show them the link, they upload in their browser (10 min, 5 files), then list_media finds it
+resize_media {url, percent: 50}   → { url: "/uploads/photo-50pct.png" } — a smaller copy beside the original; the original stays, so nothing that already points at it changes
 set_media_alt {url, altText: "Ana Ruiz, founder, in the workshop"}
 list_media {path: "team"}
 ```
@@ -78,6 +81,8 @@ list_media {path: "team"}
 - Alt text: what the image shows or what it is *for*, in the page's language, under about 125 characters, no "image of". Decorative
   images get `alt=""` in the markup.
 - Choose sensible sizes (a hero rarely needs more than ~1600px wide); `optimize: true` lets the platform recompress.
+- A file already in the library that is far bigger than it is drawn: `resize_media` with a `percent` (10-90) makes a smaller copy
+  and answers its url - point the page at the copy. Pictures (jpg, png, webp, avif, gif) and clips (mp4, webm) only.
 - Reuse what is in the library (`list_media`) before uploading a duplicate.
 - Allowed: jpg, png, webp, gif, avif, svg, ico, mp4, webm, pdf and the fonts woff, woff2, ttf, otf - at most **10 MB** each, and **50 MB** for a
   video (mp4/webm). Anything else is refused.
@@ -89,6 +94,23 @@ list_media {path: "team"}
   Never write into `logo` - the platform keeps its own files there. Look at `list_media` first: if the user already organised the library,
   follow their folders instead of adding yours.
 - Only upload material the user gave you or that is clearly free to use. Say where an image came from if it is not theirs.
+
+## Questions and answers
+
+The owner writes and answers questions in **FAQ** in the panel; shortcodes draw them. You can see what a site has with
+`list_global_shortcodes` (the codes) and `render_page` (what a page shows), but the answers themselves are panel work - tell the
+user where to add them instead of writing an FAQ as markup.
+
+```
+[gl-faq group="general" title="Common questions"]        the answered questions, with the helpful buttons
+[gl-faq-ask group="general" title="Ask us anything"]     the visitor's form: name, email, question, then a mailed confirmation
+```
+
+- A page with `[gl-faq]` carries `FAQPage` structured data for the answers it shows; a hand-written accordion of `[gl-el-details]`
+  does not. Use the built-in when the questions are real and the owner keeps them up to date, and `[gl-el-details]` for copy that
+  is part of the page itself.
+- `group` is the list a question belongs to: `[gl-faq-ask group="pricing"]` puts the answer on the pricing page's list, so the two
+  codes must agree.
 
 ## Forms and data tables
 
@@ -147,3 +169,5 @@ or the chart codes - see `shortcodes`.
 - `indexable: false` only for pages that should not appear in search (thank-you pages, drafts you want reachable).
 - Every image has alt text. The home page title says what the business is and where.
 - Do not claim what the user did not tell you (prices, awards, guarantees, locations). Ask, or mark it as placeholder in your report.
+- A page for signed-in customers is a **panel page** (`audience: "dashboard"`), not a public one: it opens at `/dashboard/<slug>` and
+  is kept out of the sitemap. Build its menu with the `/dashboard/...` addresses written out.

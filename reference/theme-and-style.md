@@ -122,10 +122,25 @@ The platform serves **one fixed stylesheet** plus whatever css you attach to a t
 
 - Scale: use a few spacing steps (`.5 1 1.5 2 3 5rem`) and `clamp()` for fluid type and padding rather than breakpoint soup.
 - Layout: `grid` with `auto-fit/minmax` or `flex` with `wrap`; one media query for the big step, not five.
-- Type: system font stack or the one the site already loads; `line-height: 1.6` for body text; `max-width: 65ch` for reading text.
+- Type: a font from the platform's repository (see **Fonts**), else a system stack; `line-height: 1.6` for body text; `max-width: 65ch` for reading text.
 - Images: `max-width: 100%; height: auto`; give `width`/`height` attributes to stop layout shift; `loading="lazy"` below the fold.
 - Motion: gentle, and wrapped in `prefers-reduced-motion`.
 - Never `!important` to win a fight with another piece - fix the other piece's scope.
+
+## Fonts
+
+The platform hosts open-licence web fonts on its own CDN, so a site never calls Google Fonts or another third party. Call **`list_fonts`**:
+each entry gives `scripts`, `weights`, a `stylesheet` URL and the `fontFamily` to use.
+
+```css
+@import url("<stylesheet>");           /* first line of the theme's css */
+body { font-family: <fontFamily>; }
+h1, h2, h3 { font-weight: 700; }
+```
+
+- Pick by the language: a `rtl` Persian/Arabic site needs a font whose `scripts` include `arabic` (e.g. Vazirmatn); a Latin-only font falls back for the letters it lacks.
+- One body family and at most one display family; load only the weights the entry lists (400/500/700).
+- The stylesheets use `font-display: swap` and split by script, so the browser fetches only the parts the page uses. Do not link the same font twice.
 
 ## Right-to-left languages
 

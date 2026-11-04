@@ -1,6 +1,7 @@
 ---
 name: on4net-site-builder
 description: Build, redesign and edit a website on an ON4NET installation through the ON4NET MCP server - designs, theme layouts, elements, sections, pages, menus, media, blog posts with categories and tags, and data tables for forms. Use whenever the user asks to create or change a site, a page, a theme, a section, a blog or a contact form on ON4NET, or hands you an ON4NET agent key.
+version: 2.2.0
 ---
 
 # Building a site on ON4NET
@@ -54,15 +55,17 @@ Section  [sk-code]   one band of a page (hero, features, pricing, testimonials, 
 Element  [el-code]   a small reusable piece (button, card, badge, testimonial, price box…) used inside sections, on pages, in
                      posts and in theme layouts. Same anatomy. ANYTHING THAT MAY BE USED IN MORE THAN ONE PLACE IS AN ELEMENT.
 Built-in [gl-…]      pieces that exist on every site with no creating: logo, menus, language switcher, blog list,
-                     data tables, charts, icons, shapes, headings, buttons.
+                     FAQ list and ask-a-question form, data tables, charts, icons, shapes, headings, buttons.
 Parameters           {{title}} in the markup  ⇄  [sk-hero title="Hello"] on the page. Every parameter has a default.
 Menu                 a small tree of links, shown with [gl-menu-<slug>].
 Media                files in the library; a page points at their url.
 Blog                 posts (HTML) + categories + tags, per language. Drafts until published.
 Data table           a named list of fields; a `<form data-collection="slug">` fills it; owners read the entries.
+FAQ                  questions the owner answered in the panel, drawn by [gl-faq]; [gl-faq-ask] is the visitor's form.
+Panel page           a page with audience: "dashboard" - signed-in customers read it at /dashboard/<slug>; visitors never.
 ```
 
-Three consequences you must keep in mind:
+Four consequences you must keep in mind:
 
 - **A page is mostly a list of section codes.** Do not paste a whole page of HTML into a page. Make each band a **section**, then
   `create_page` with `html: "[sk-hero title=\"…\"][sk-features][sk-cta]"`. That is what lets the owner re-order, edit and reuse
@@ -72,6 +75,9 @@ Three consequences you must keep in mind:
 - **Languages are separate.** A Persian page and its English twin are two pages in two designs. Create each language's design,
   theme layout, menu and pages; do not assume one serves both. Right-to-left languages need `dir="rtl"` thinking (see
   `theme-and-style`).
+- **Two kinds of page.** `audience: "dashboard"` puts a page in the signed-in customer panel (`/dashboard/...`) instead of the
+  site: visitors cannot reach it. A menu entry for one needs the `/dashboard/...` address written out, because a `PAGE` entry
+  resolves to the public address - give the entry a `url`.
 
 ## 3. The build order
 
@@ -83,9 +89,9 @@ Follow it unless the site already has the earlier layers. Each step lists its to
 | 1 | **Foundation: the theme layout.** One canvas with header, the `[SYS-PAGE-CONTENT]` slot and footer; the logo, menu and language switcher as built-ins; the site's CSS. Then give the **site frame** (blog, search, contact) the same header and footer. | `create_theme_layout` / `update_theme_layout`, `set_site_frame` |
 | 2 | **Elements** the sections will share (button, card, heading style). Skip if the built-ins (`gl-el-button`, `gl-el-heading`) are enough. | `create_element` |
 | 3 | **Sections**, one per band, each with parameters and defaults so one section serves several pages. A piece that will be used elsewhere is an element (step 2), not a section. | `create_section` |
-| 4 | **Media.** Upload images first, set alt text, use the returned urls. | `upload_media`, `create_upload_link`, `set_media_alt` |
+| 4 | **Media.** Upload images first, set alt text, use the returned urls; a picture far larger than it is drawn gets `resize_media` and the copy's url. | `upload_media`, `create_upload_link`, `resize_media`, `set_media_alt` |
 | 5 | **Menus.** Create the menu, then fill it with ids of pages that exist (so create pages first, then `set_menu_items`). | `create_menu`, `set_menu_items` |
-| 6 | **Pages** as drafts, each with its content, theme, address and SEO. | `create_page` |
+| 6 | **Pages** as drafts, each with its content, theme, address and SEO. A second set with `audience: "dashboard"` is the customer panel. | `create_page` |
 | 7 | **Blog**: categories and tags first, then posts as drafts. | `create_category`, `create_tag`, `create_post` |
 | 8 | **Forms and data.** A table with its fields, then the form markup in a section. | `create_collection` |
 | 9 | **Verify** every page. Look for unresolved codes, empty images, broken links. | `render_page` |
@@ -143,12 +149,12 @@ show the user the diff, then `apply_blueprint`. Use the granular tools for every
 
 **Orient:** `get_site`, `get_guide`, `list_global_shortcodes`
 **Structure:** `list_designs` `get_design` `create_design` `update_design` `delete_design` · `set_site_frame` ·
-`list_theme_layouts` `get_theme_layout` `create_theme_layout` `update_theme_layout` `delete_theme_layout` `audit_theme_colors` · `list_icons`
+`list_theme_layouts` `get_theme_layout` `create_theme_layout` `update_theme_layout` `delete_theme_layout` `audit_theme_colors` · `list_icons` · `list_fonts` (the hosted web fonts: use these, not Google Fonts; see `theme-and-style`)
 **Pieces:** `list_elements` `get_element` `create_element` `update_element` `archive_element` `delete_element` ·
 `list_sections` `get_section` `create_section` `update_section` `delete_section` `reorder_sections`
 **Pages:** `list_pages` `get_page` `render_page` `create_page` `update_page` `publish_page` `delete_page`
 **Navigation:** `list_menus` `get_menu` `create_menu` `update_menu` `set_menu_items` `delete_menu`
-**Media:** `list_media` `upload_media` `create_upload_link` `set_media_alt`
+**Media:** `list_media` `upload_media` `create_upload_link` `resize_media` `set_media_alt`
 **Blog:** `list_posts` `get_post` `create_post` `update_post` `publish_post` · `list_categories` `create_category` `update_category` · `list_tags` `create_tag` `update_tag`
 **Data:** `list_collections` `get_collection` `create_collection` `update_collection`
 **Whole site:** `preview_blueprint` `apply_blueprint`
