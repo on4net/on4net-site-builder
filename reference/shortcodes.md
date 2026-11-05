@@ -108,7 +108,7 @@ truth, with each one's parameters. The families:
 | Brand | `[gl-logo]` `[gl-logo-dark]` `[gl-logo-icon]` | the site's logo (switches with the theme), the dark-mode file, the favicon. Take `class` and `alt`. Never hard-code the logo. |
 | Menus | `[gl-menu-<slug>]` | a menu made with `create_menu` / `set_menu_items` - slug `main` is `[gl-menu-main]` |
 | Language | `[gl-lang-switcher]` `[gl-locale]` | the language switcher (empty on a one-language site); the current language's link prefix |
-| Blog | `[gl-blog-list layout="cards" limit="3" columns="title,excerpt,date" order="newest" category="…" tag="…"]` | the site's published posts in the page's language (drafts never appear). `layout="cards"` draws linked cards with the first picture of each post as its cover; the default is a plain table |
+| Blog | `[gl-blog-list]` `[gl-blog-list layout="cards" limit="3" columns="title,excerpt,date" category="news"]` | the site's published posts in the page's language (drafts never appear), as a table or as linked cards - every parameter is in **The blog** below |
 | Data | `[gl-data-table table="slug" limit="5" columns="a,b" order="oldest" title="…"]` `[gl-feed source="…" field="…" limit="5"]` | a data table's entries, or an imported source's rows |
 | Charts | `[gl-chart-bar]` `[gl-chart-line]` `[gl-chart-donut]` `[gl-chart-stat]` with `table=` `field=` `bucket=` `metric=` | draw a table's own records |
 | Icons | `[gl-icon-<name>]` with `size="2rem"` `class="…"` | the platform's icons: `list_icons` (search by word) answers every name that exists, including the ones the operator added to the repository; do not invent one. The ~30 that ship: qr, leaf, chart, brain, chat, messenger, live, publish, editor, bot, zap, shield, arrow, check, globe, award, trend, device, pen, cpu, megaphone, phone, mail, share, linkedin, instagram, x, facebook, sun, moon. Colour comes from the surrounding text colour. |
@@ -119,6 +119,41 @@ truth, with each one's parameters. The families:
 | Plans | `[gl-plans highlight="pro" cta="Start" columns="3" only="free,pro"]` `[gl-signup plan="pro" label="Start with Pro"]` | the installation's public plans as cards, and a button to sign-up. **Only on the installation's own site** - on a tenant's site they draw nothing and are not in `list_global_shortcodes`, so a tenant agent never sees them. Prices and limits come from the plan rows; never retype them. |
 
 Prefer a built-in over writing the same markup: it follows the site's branding and works on the designer's canvas.
+
+## The blog: `[gl-blog-list]`
+
+One code covers the blog: written anywhere a shortcode may go, it lists this site's posts. The read happens on the server while
+the page is rendered, so the titles are in the HTML a crawler receives, and no attribute can make it read another site's posts.
+
+| Parameter | Default | What it does |
+|---|---|---|
+| `layout` | `table` | `table` draws a grid of the fields the author chose; `cards` draws each post as a card that links to it, with the first picture of the post's body as the cover. |
+| `columns` | `title,date` | The fields a **table** shows, comma-separated: `title`, `excerpt`, `date`, `category`, `tags`. A key outside this list is dropped, never shown as an empty column. A `cards` list ignores it and draws its own card (cover picture, category, title, excerpt, date). |
+| `limit` | `10` | How many posts, at most `50`. A draft is not counted, because it is never shown. |
+| `order` | `newest` | `newest` or `oldest`, by the day the post was created. |
+| `category` | *(empty)* | One category's **slug** (the filter's vocabulary; the list shows the category's name). Empty shows every category. |
+| `tag` | *(empty)* | One tag's slug, the same way. Empty shows every tag. |
+| `title` | *(empty)* | A heading above the list. |
+| `empty` | `No data yet.` | What the reader is told while this site has published nothing in the page's language. It is never an empty box. |
+| `class` | *(empty)* | Extra CSS classes on the frame. |
+
+**What it never shows.** Drafts, posts of another language, and another site's rows. The language is the page's own, so one
+language's index never mixes the other's posts. A read that fails leaves a sentence (`The posts could not be read.`) where the
+rows belong, rather than breaking the page.
+
+**Class hooks.** `cards` draws the same markup as the built-in blog screens, so one theme styles both: `.blog-list` ·
+`.post-card` with `.post-card__image`, `.post-card__category`, `.post-card__title`, `.post-card__excerpt`, `.post-card__date`.
+`table` draws the data family's grid (`.on4-data-grid`).
+
+**As a template page.** A page can be the design of a screen (see `theme-and-style`):
+
+- slug `blog` - the blog's front page: `[gl-blog-list limit="12" columns="title,excerpt,date,category"]`.
+- slug `category` - the template of every category's page: declare `queryParams: [{key: "category"}]` and write
+  `[gl-blog-list category="{{category}}"]`; `/category/news` fills `news` in.
+- slug `tag` - the same for tags: `queryParams: [{key: "tag"}]` and `[gl-blog-list tag="{{tag}}"]`.
+
+The **indexes** `/category` and `/tag` are still drawn by the platform: no shortcode lists the terms themselves yet, so a page
+cannot replace those two screens. A single post (`/blog/<slug>`) is always drawn by the platform.
 
 ## Where shortcodes may and may not appear
 

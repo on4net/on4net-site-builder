@@ -87,6 +87,8 @@ parameter value (a `<form>` there is stripped).
 | `[gl-menu-<slug>]` | A menu made with `create_menu` / `set_menu_items`: slug `main` is `[gl-menu-main]`. Takes `orientation` (`horizontal`/`vertical`), `mobile` (`collapse`/…), `label` (the nav's accessible name). The place for site-wide links. |
 | `[gl-social]` | The social-links panel built from the owner's settings (a link with no value is left out). |
 | `[gl-theme-toggle]` | The dark/light switch. Put it **once**, in the theme layout. |
+| `[gl-map]` | The site’s own location (panel: Settings ▸ Google ▸ Location) as an interactive map, with the address and a directions link under it. Draws nothing until the owner sets a location. | `title`, `height`, `zoom`, `button`, `class` |
+| `[gl-map-pin]` | The same map as a **picture with the site’s logo as the pin**. Needs a Maps API key in the same panel; without one it draws the interactive map instead. | `title`, `height`, `zoom`, `button`, `class` |
 
 ## Pictures
 
@@ -103,7 +105,7 @@ and `render_page` is how you check it.
 
 | Code | What it does | Parameters worth knowing |
 |---|---|---|
-| `[gl-blog-list]` | The published posts in the page's language (drafts never appear). The way to make a blog index, and to put "related posts" on a page. | `layout` (`table`, or `cards` for linked cards with each post's first picture), `columns`, `limit`, `order`, `category`, `tag`, `title` |
+| `[gl-blog-list]` | The published posts in the page's language (drafts never appear). The way to make a blog index, and to put "related posts" on a page. | `layout` (`table`, or `cards` for linked cards with each post's first picture), `columns` (`title,excerpt,date,category,tags`; default `title,date`), `limit` (1-50, default 10), `order` (`newest`/`oldest`), `category` and `tag` (one slug each), `title`, `empty`, `class`. Full detail in the `shortcodes` topic. |
 | `[gl-data-table]` | The entries of one of the site's data tables, or of an imported source. | `table` or `source`, `columns`, `limit`, `order`, `title`, `empty` |
 | `[gl-feed]` | A short list of one field from a table or source, optionally linked. | `source`, `field`, `link`, `limit`, `order` |
 | `[gl-chart-bar]` `[gl-chart-line]` | A bar or line chart of how many records arrived per `bucket` (`day`/`week`/`month`). | `table`, `field`, `bucket`, `limit`, `colour`, `height` |

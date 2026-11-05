@@ -55,7 +55,8 @@ Section  [sk-code]   one band of a page (hero, features, pricing, testimonials, 
 Element  [el-code]   a small reusable piece (button, card, badge, testimonial, price box…) used inside sections, on pages, in
                      posts and in theme layouts. Same anatomy. ANYTHING THAT MAY BE USED IN MORE THAN ONE PLACE IS AN ELEMENT.
 Built-in [gl-…]      pieces that exist on every site with no creating: logo, menus, language switcher, blog list,
-                     FAQ list and ask-a-question form, data tables, charts, icons, shapes, headings, buttons.
+                     FAQ list and ask-a-question form, the site’s location as a map, data tables, charts, icons, shapes,
+                     headings, buttons.
 Parameters           {{title}} in the markup  ⇄  [sk-hero title="Hello"] on the page. Every parameter has a default.
 Menu                 a small tree of links, shown with [gl-menu-<slug>].
 Media                files in the library; a page points at their url.

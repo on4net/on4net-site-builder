@@ -7,6 +7,9 @@ language. It is a draft until `publish_post`.
 
 **Order of work:** categories and tags first (they are per language), then posts.
 
+A **list of posts** on a page is `[gl-blog-list]`: the fields, the order, a category or tag filter and the two layouts are in
+the `shortcodes` topic.
+
 Every category and tag should have a **picture** (upload it first, use the returned `url` as `image`) and search text: `/category` and
 `/tag` list them as cards (picture, name, number of posts), and `/category/<slug>` is an indexed page whose title and description are the
 `seoTitle` / `seoDescription`. One that has no picture is drawn with a plain placeholder, so a missing picture is never broken, only plain.
@@ -84,8 +87,8 @@ list_media {path: "team"}
 - A file already in the library that is far bigger than it is drawn: `resize_media` with a `percent` (10-90) makes a smaller copy
   and answers its url - point the page at the copy. Pictures (jpg, png, webp, avif, gif) and clips (mp4, webm) only.
 - Reuse what is in the library (`list_media`) before uploading a duplicate.
-- Allowed: jpg, png, webp, gif, avif, svg, ico, mp4, webm, pdf and the fonts woff, woff2, ttf, otf - at most **10 MB** each, and **50 MB** for a
-  video (mp4/webm). Anything else is refused.
+- Allowed: jpg, png, webp, gif, avif, svg, ico, mp4, webm, pdf and the fonts woff, woff2, ttf, otf - at most **10 MB** each, **100 MB** for a
+  video (mp4/webm) and **800 KB** for a picture (jpg, png, webp, gif, avif - shrink or resize it before uploading). Anything else is refused.
 - **Video**: use `<video controls muted playsinline preload="metadata" poster="…">`; a looping background clip also gets `autoplay loop`
   (browsers only autoplay when it is `muted`). Keep a clip short and compressed (H.264 mp4, ideally under ~10 MB), and give it a poster image.
 - **Folders**: nobody needs to create a folder first - naming one in `folder` creates it, and the site's own root is already separate from
@@ -95,6 +98,21 @@ list_media {path: "team"}
   follow their folders instead of adding yours.
 - Only upload material the user gave you or that is clearly free to use. Say where an image came from if it is not theirs.
 
+## The site’s location
+
+The map is not a block you fill: it is the **site’s own setting**, written once in the panel (Settings ▸ Google ▸ Location -
+an address and, when they know them, the latitude and longitude). Every page that places `[gl-map]` follows it.
+
+```
+[gl-map height="420px" title="Where we are"]            the interactive map, no key needed
+[gl-map-pin title="Where we are"]                       the same place, with the site’s logo as the pin (needs a key)
+```
+
+- You cannot set the location with a tool: it is a site setting, so tell the owner where to type it instead of inventing an address.
+- Without an API key the map is the free embed with Google’s own pin; `[gl-map-pin]` (the logo pin) falls back to it.
+- Leave the location empty and both codes draw nothing - say so rather than placing a map of nowhere.
+- The block also writes the `Place` structured data (name, address, coordinates), which is what a search engine reads for a
+  local business. Fill the address as one line: it is written as a street address, not split into city and postcode.
 ## Questions and answers
 
 The owner writes and answers questions in **FAQ** in the panel; shortcodes draw them. You can see what a site has with
