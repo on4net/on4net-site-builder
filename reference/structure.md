@@ -12,8 +12,8 @@ know what it belongs to, what it affects and what deleting it does.
 | **Design** | the container of one language's pages | site + language | id | name, language, isDefault |
 | **Theme layout** | the chrome around a page: header, page slot, footer, plus css/js | site + language | id | name, html (canvas), css, js, framework |
 | **Page** | what a visitor opens | a design (and so a language) | address `slug`, under its parent's | title, slug, content html, css, theme per viewport, SEO, published, isHome |
-| **Section** | one band of a page | site (library) or owned by one page | code `sk-…` | name, type, html, css, js, parameters, order |
-| **Element** | a reusable piece | site | code `el-…` | name, html, css, js, parameters, archived |
+| **Section** | one band of a page | site (library) or owned by one page | code `sk-…` | name, type, html, css, js, order |
+| **Element** | a reusable piece | site | code `el-…` | name, html, css, js, parameters and defaults, archived |
 | **Menu** | navigation | site + language (or `all`) | slug → `[gl-menu-<slug>]` | items (tree, one drop-down level) |
 | **Media file** | an uploaded file | site | its `url` | alt text, description |
 | **Post** | a blog article | site + language | slug under the blog | title, slug, content html, category, tags, SEO, published |
@@ -35,8 +35,8 @@ fa: design "Main (fa)"  → pages: home, about, services     theme layout "Main 
   logo-only or icon menu, wrong for text links).
 - Use only languages `get_site` lists. You cannot add one; the owner does that in Settings.
 - Sections and elements are written in a language too (`create_section` takes `language`), but a code is unique per **site**, so
-  a Persian hero and an English hero need different codes (`sk-hero-en`, `sk-hero-fa`) unless one section is built with
-  parameters for the words and used by both.
+  a Persian hero and an English hero need different codes (`sk-hero-en`, `sk-hero-fa`). Sections take no parameters; if
+  the two share a look, put it in an element with parameters for the words and call it from each section.
 
 ## How a page is put together
 
@@ -52,7 +52,7 @@ fa: design "Main (fa)"  → pages: home, about, services     theme layout "Main 
         │   [sk-cta]              │     [sk-cta]               │
         │                         └──────────────────────────┘
         ▼                         footer
- each [sk-…] expands to that section's html (+ its css and js), with the parameters the page passed
+ each [sk-…] expands to that section's html (+ its css and js)
  each section may contain [el-…] and [gl-…], which expand the same way (nesting up to 5 levels)
 ```
 

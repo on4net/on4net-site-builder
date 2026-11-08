@@ -7,9 +7,7 @@ different things in different places.
 ## The syntax
 
 ```
-[sk-hero]                                   a section, with every parameter at its default
-[sk-hero title="Build faster" cta="Start"]  ... passing parameters
-[sk-hero title="She said \"hi\"" dark="true"]   ... a quote inside a value is written \"
+[sk-hero]                                   a section, without parameters
 [el-cta-button label="Contact us" href="/contact"]
 [gl-logo class="h-8" alt="Acme"]
 ```
@@ -25,7 +23,7 @@ different things in different places.
 
 ## Section or element?
 
-Both take parameters, and they are not interchangeable:
+Sections and elements are not interchangeable:
 
 - A **section** is one band of one page layout (a hero, a features grid, a pricing band). A page lists sections.
 - An **element** is a piece that may be used in more than one place: inside several sections, on a page, in a blog post, in a theme
@@ -37,30 +35,35 @@ Both take parameters, and they are not interchangeable:
 
 ## Writing a piece that takes parameters
 
-Declare each parameter once (`params`), use `{{key}}` in the piece's html, css and js, and give every parameter a default.
+**Parameters belong to elements.** Declare parameters once on an element (`params`), use `{{key}}` in the element's html, css and
+js, and give every parameter a default. The section then supplies values when it calls the element:
 
 ```
-create_section {
-  code: "hero-split", name: "Hero: split",
+create_element {
+  code: "feature-card", name: "Feature card",
   params: [
-    { key: "title",    label: "Headline", type: "text",     default: "Welcome" },
-    { key: "text",     label: "Intro",    type: "textarea", default: "A short line about what you do." },
-    { key: "image",    label: "Image",    type: "image",    default: "" },
-    { key: "cta",      label: "Button",   type: "text",     default: "Get started" },
-    { key: "href",     label: "Link",     type: "url",      default: "/contact" },
-    { key: "align",    label: "Layout",   type: "select",   options: ["left","right"], default: "left" }
+    { key: "title", label: "Title", type: "text", default: "Feature" },
+    { key: "text", label: "Description", type: "textarea", default: "" },
+    { key: "icon", label: "Icon", type: "text", default: "" }
   ],
-  html: "<section class=\"sk-hero-split sk-hero-split--{{align}}\">
-           <div class=\"sk-hero-split__copy\"><h1>{{title}}</h1><p>{{text}}</p><a class=\"btn\" href=\"{{href}}\">{{cta}}</a></div>
-           <img class=\"sk-hero-split__img\" src=\"{{image}}\" alt=\"\">
-         </section>",
-  css:  ".sk-hero-split{display:grid;gap:2rem;padding:4rem 1.5rem}
-         @media(min-width:900px){.sk-hero-split{grid-template-columns:1fr 1fr;align-items:center}}
-         .sk-hero-split--right .sk-hero-split__img{order:-1}"
+  html: "<article><h3>{{title}}</h3><p>{{text}}</p></article>"
+}
+
+create_section {
+  code: "features-simple", name: "Features: simple",
+  html: "<section class=\"sk-features-simple\">
+           [el-feature-card title=\"Fast setup\" text=\"Start in minutes.\"]
+           [el-feature-card title=\"Easy edits\" text=\"Change one shared element.\"]
+         </section>"
 }
 ```
 
-then on a page: `[sk-hero-split title="Roofs that last" image="/uploads/roof.jpg" align="right"]`.
+Then on a page: `[sk-features-simple]`.
+
+Do not put page-specific parameter definitions or `{{key}}` placeholders in a section for values that belong to repeated elements. If
+the same band layout needs a different set of values on another page, create another section (such as `sk-features-enterprise`) and
+make its element calls use that section's values. Each section is a separate band; each element remains reusable with one shared
+parameter definition.
 
 ### Parameter types
 
@@ -160,16 +163,16 @@ cannot replace those two screens. A single post (`/blog/<slug>`) is always drawn
 - **Page content, sections, elements, theme layout, site frame, blog posts:** yes.
 - **A page's SEO title/description and a menu's labels:** no - plain text.
 - **Inside a parameter value:** no - the value is data; put the shortcode in the markup around it.
-- **`{{…}}` placeholders** only resolve in a piece that **declares** that parameter (or inside a loop over it). A `{{key}}` on a
-  page itself resolves only if the page declares that key as a query parameter - leave them to sections.
+- **`{{…}}` placeholders** only resolve in an element that **declares** that parameter (or inside a loop over it). A `{{key}}` on a
+  page itself resolves only if the page declares that key as a query parameter; never declare page-specific placeholders in a section.
 
 ## Mistakes that cost an afternoon
 
 1. A page uses `[sk-pricing-table]` but the section was created as `sk-pricing` → literal text on the live page. Copy codes from
    `list_sections`.
-2. A parameter used as `{{subtitle}}` but never declared → shows empty. Declare every key you use, with a default.
+2. An element parameter used as `{{subtitle}}` but never declared → shows empty. Declare every element key you use, with a default.
 3. Unscoped CSS (`h2 { … }` in a section) restyles every h2 on the site. Prefix with the piece's own class.
 4. Passing a list without escaping quotes (`items="[{"a":1}]"`) → the attribute ends early. Escape: `\"`.
-5. A `<form>` inside an `html`-typed **parameter** is stripped. Put forms in the section's own markup instead.
-6. A very long `[sk-…]` line with ten parameters is unreadable for the owner. Put the data in the section's defaults, pass only what
-   differs per page.
+5. A `<form>` inside an `html`-typed element parameter is stripped. Put forms in the section's own markup or in a dedicated element.
+6. A section should not carry a long list of parameters. Put reusable values on elements and keep each section element call readable;
+   if the set of values differs substantially, create another section.

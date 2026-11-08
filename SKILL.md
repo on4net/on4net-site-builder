@@ -1,7 +1,7 @@
 ---
 name: on4net-site-builder
 description: Build, redesign and edit a website on an ON4NET installation through the ON4NET MCP server - designs, theme layouts, elements, sections, pages, menus, media, blog posts with categories and tags, and data tables for forms. Use whenever the user asks to create or change a site, a page, a theme, a section, a blog or a contact form on ON4NET, or hands you an ON4NET agent key.
-version: 2.2.0
+version: 2.3.0
 ---
 
 # Building a site on ON4NET
@@ -29,11 +29,12 @@ Read this whole file once. Open a reference when you reach its subject:
 | `theme-and-style` | you build the theme layout, colours, dark mode, responsive and right-to-left behaviour |
 | `content-and-data` | blog, categories, tags, menus, media, forms and data tables, SEO |
 | `blueprint` | you build a whole site at once with one document |
+| `google` | the owner asks about Analytics, Search Console, search keywords, visitor numbers or Google reviews: what is connected, what you may set, and what is public |
 | `recipes` | you want a worked example: a business site, a bilingual site, a blog, a contact form, a redesign |
 
 ## 1. Start every session the same way
 
-1. `get_site` - which site, its **languages** (default first, with direction), and the key's **scopes** and permissions.
+1. `get_site` - which site, its own verified **domain** (when it has one) and what is set up with Google, its **languages** (default first, with direction), and the key's **scopes** and permissions.
    If the user's request needs a permission the key lacks, say so now instead of failing later.
 2. **Take inventory before you build.** `list_designs`, `list_theme_layouts`, `list_sections`, `list_elements`, `list_pages`,
    `list_menus`, and `list_global_shortcodes` (the built-ins you get for free). An empty site is the exception: most sites already
@@ -51,7 +52,7 @@ Site
              content = [sk-hero][sk-features][sk-cta]        ← a list of SECTION codes, plus a little markup
              theme   = a THEME LAYOUT per viewport           ← the header + footer + the slot the page goes in
 
-Section  [sk-code]   one band of a page (hero, features, pricing, testimonials, CTA…). html + css + js + parameters.
+Section  [sk-code]   one band of a page (hero, features, pricing, testimonials, CTA…). html + css + js.
 Element  [el-code]   a small reusable piece (button, card, badge, testimonial, price box…) used inside sections, on pages, in
                      posts and in theme layouts. Same anatomy. ANYTHING THAT MAY BE USED IN MORE THAN ONE PLACE IS AN ELEMENT.
 Built-in [gl-…]      pieces that exist on every site with no creating: logo, menus, language switcher, blog list,
@@ -89,7 +90,7 @@ Follow it unless the site already has the earlier layers. Each step lists its to
 | 0 | **Plan.** Pages and their sections on paper first: the list of pages, the section list per page, the elements those need, the menu, the languages. Show it to the user. | - |
 | 1 | **Foundation: the theme layout.** One canvas with header, the `[SYS-PAGE-CONTENT]` slot and footer; the logo, menu and language switcher as built-ins; the site's CSS. Then give the **site frame** (blog, search, contact) the same header and footer. | `create_theme_layout` / `update_theme_layout`, `set_site_frame` |
 | 2 | **Elements** the sections will share (button, card, heading style). Skip if the built-ins (`gl-el-button`, `gl-el-heading`) are enough. | `create_element` |
-| 3 | **Sections**, one per band, each with parameters and defaults so one section serves several pages. A piece that will be used elsewhere is an element (step 2), not a section. | `create_section` |
+| 3 | **Sections**, one per band. A reusable element supplies parameters and defaults; each section makes element calls with its own values. A piece used elsewhere is an element (step 2), not a section. | `create_section` |
 | 4 | **Media.** Upload images first, set alt text, use the returned urls; a picture far larger than it is drawn gets `resize_media` and the copy's url. | `upload_media`, `create_upload_link`, `resize_media`, `set_media_alt` |
 | 5 | **Menus.** Create the menu, then fill it with ids of pages that exist (so create pages first, then `set_menu_items`). | `create_menu`, `set_menu_items` |
 | 6 | **Pages** as drafts, each with its content, theme, address and SEO. A second set with `audience: "dashboard"` is the customer panel. | `create_page` |
@@ -114,14 +115,25 @@ show the user the diff, then `apply_blueprint`. Use the granular tools for every
    a testimonial, a price box, a call-to-action strip) - it must be an **element** (`create_element`) and the section uses
    `[el-…]`. If you are about to copy a section's markup, or to paste the same markup into a second place, stop and extract it into an
    element first.
-4. **Use the built-ins; never invent a code.** `list_global_shortcodes` is the list of `gl-…` codes that exist. An unknown code
+
+   **A page is made of sections.** A section is the page's own composition: one band that combines several elements
+   (`[el-…]`, `[gl-…]` built-ins) with plain HTML around them - a heading, a grid, a wrapper, some text. That is what you place on
+   a page, and most of a page is sections. An element is placed on a page by itself **only** when that one element does the whole
+   job (a single button, a lone banner); otherwise wrap it in a section. So: build elements for the reusable pieces, then compose
+   them into sections, then put the sections on pages.
+4. **Parameters belong to elements, not sections.** Create a reusable element with parameters and default values, then pass its
+   different values from the section, for example `[el-product-card title="Monthly Plan" price="$20"]`. Do not declare parameters
+   on the section itself or use `{{key}}` in section markup for repeated page-specific values. If a section needs materially
+   different values, create another section and use the appropriate element calls inside it instead of changing the element's
+   shared definition.
+5. **Use the built-ins; never invent a code.** `list_global_shortcodes` is the list of `gl-…` codes that exist. An unknown code
    renders as literal text on the live page.
-5. **Every parameter has a default**, so `[sk-code]` alone still renders. Use `{{key}}` for anything that varies; do not
-   hard-code copy that belongs to one page inside a shared section.
-6. **Unique, readable codes.** Lower case, hyphens: `sk-hero-split`, `el-cta-button`. Codes are per site.
-7. **Scope your CSS.** Prefix every rule with a class unique to the piece (`.sk-hero-split …`). Unscoped CSS in one section
+6. **Every element parameter has a default**, so `[el-code]` still renders. Passing values from a section or page overrides the
+   element default; do not hard-code copy that belongs to one page inside a shared element.
+7. **Unique, readable codes.** Lower case, hyphens: `sk-hero-split`, `el-cta-button`. Codes are per site.
+8. **Scope your CSS.** Prefix every rule with a class unique to the piece (`.sk-hero-split …`). Unscoped CSS in one section
    restyles the whole site.
-8. **No secrets, no tracking you were not asked for.** Do not put API keys, tokens or third-party scripts into markup. Do not copy
+9. **No secrets, no tracking you were not asked for.** Do not put API keys, tokens or third-party scripts into markup. Do not copy
    visitor data (form entries) anywhere.
 9. **Stay inside your scopes.** A `403` means the key does not cover the act. Do not retry, do not look for a way around it:
    tell the user which scope is missing.
@@ -149,6 +161,8 @@ show the user the diff, then `apply_blueprint`. Use the granular tools for every
 ## 6. Tool map
 
 **Orient:** `get_site`, `get_guide`, `list_global_shortcodes`
+**Google:** `get_google_status` (the site's own verified `domain`, and whether the Analytics tag, the Search Console tag and the Business Profile are set) · `set_google_tags` (the GA4 `G-…` id and the Search Console verification value; refused until the site has its own verified domain, and needs the Google scope) · `setup_search_console` (verification, property and sitemap in one call) · `search_console_queries` (the keywords, pages, countries or devices the site is found by) · `setup_analytics` (finds or creates the GA4 property and stream and sets the tag) · `analytics_report` (users, sessions and views by page, source, country, device or day) · `business_reviews` (the Business Profile's newest reviews) · `reply_to_review` and `create_business_post` (both **public**: show the owner the text and get their agreement first). All the Google tools need a key with the **Google** scope
+
 **Structure:** `list_designs` `get_design` `create_design` `update_design` `delete_design` · `set_site_frame` ·
 `list_theme_layouts` `get_theme_layout` `create_theme_layout` `update_theme_layout` `delete_theme_layout` `audit_theme_colors` · `list_icons` · `list_fonts` (the hosted web fonts: use these, not Google Fonts; see `theme-and-style`)
 **Pieces:** `list_elements` `get_element` `create_element` `update_element` `archive_element` `delete_element` ·

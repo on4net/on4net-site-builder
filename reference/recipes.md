@@ -16,11 +16,12 @@ Brief: "Acme Roofing - home, services, about, contact. Orange, friendly, trustwo
 4. Foundation: `create_design {name: "Main (en)", language: "en"}`, then `create_theme_layout` (canvas with `[gl-logo]`,
    `[gl-menu-main]`, `[SYS-PAGE-CONTENT]`, footer with `[gl-menu-footer]`; css with the spacing scale and brand variables).
    Then `set_site_frame` with the same header and footer.
-5. Sections, one `create_section` each, every one with parameters and defaults and **scoped** CSS. Create the shared ones first
-   (`sk-page-header`, `sk-cta-band`) because several pages use them.
+5. Sections, one `create_section` each with **scoped** CSS. Put parameters and defaults on reusable elements; have each section pass
+   the values it needs to its `[el-…]` calls. Create the shared elements and sections first (`sk-page-header`, `sk-cta-band`) because
+   several pages use them.
 6. Images: `upload_media` for the logo-free hero photo and team photos (the user's), `set_media_alt` for each.
 7. Pages: `create_page` for Home, About, Contact, Services, then its children with `parentId`. Each with `html`
-   (a list of `[sk-…]` with page-specific parameters), `desktopThemeId`, and `seo`.
+   (a list of `[sk-…]`; values vary inside `[el-…]` calls), `desktopThemeId`, and `seo`.
    Then `update_page {id: home, isHome: true}`.
 8. `create_collection {name: "Contact", slug: "contact", fields: […]}`; the `sk-contact-form` section's `<form data-collection="contact">`.
 9. Menus: `create_menu` main + footer; `set_menu_items` with ids from `list_pages`.
@@ -55,8 +56,8 @@ then do steps 10-12.
 
 1. `get_site` must list both languages (you cannot add one; if `fa` is missing, tell the user to add it in Settings > Languages).
 2. A design, a theme layout, a menu and pages **per language**. The Persian theme mirrors the header; CSS uses logical properties.
-3. Sections: one section with parameters serves both languages **if the words are parameters** - the structure is the same, the
-   page passes `title="…"` in the page's language. Where the layout differs (image side, ornament), make `-fa` variants.
+3. The structure can be shared, but translated words should be passed to reusable element parameters. Create separate `sk-…`
+   sections when two languages or pages need materially different values or layout (image side, ornament).
 4. Same slugs for pages that correspond (`about` in both) so the language switcher can link them; Persian copy written natively.
 5. `[gl-lang-switcher]` in each theme header. `render_page` each page in each language (`locale`).
 6. Persian blog: its own categories and tags with Persian names; slugs are lower-case Latin transliterations or short English words.
@@ -87,6 +88,6 @@ then do steps 10-12.
 | the whole site's headings changed | a section's CSS has an unscoped selector | prefix every selector with the section's class |
 | the header is missing on a page | no `desktopThemeId` on the page | `update_page` with a theme layout |
 | the blog looks different from the pages | the site frame is the platform default | `set_site_frame` with the theme's header/footer |
-| a parameter shows empty | it is used as `{{key}}` but not declared, or has no default | `update_section` with the declaration |
+| a parameter shows empty | it is used as `{{key}}` in an element but not declared, or has no default | `update_element` with the declaration |
 | a menu is empty | `[gl-menu-<slug>]` slug differs from the menu's, or the menu has no items | `list_menus`; fix the slug or `set_menu_items` |
 | text runs off the screen on a phone | fixed widths, or no `min-width: 0` on a grid/flex child | fluid CSS (`minmax`, `clamp`, `flex-wrap`) |

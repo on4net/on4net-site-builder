@@ -55,7 +55,9 @@ Differences from the granular tools that matter:
 - Set `published: false` on every page, and `isHome: true` on **exactly one page per design**.
 - A page's content lists **section codes**: `"[sk-hero-split][sk-cta]"` - every code must exist in `sections` (or already on the site).
 - `type` of a section is one of `HERO WELCOME SERVICES INTRO STATS CTA TESTIMONIALS BOLD_STATEMENT SPLIT_FEATURE CUSTOM`.
-- `params` is the same list of parameter definitions `create_section` takes (`key`, `label`, `type`, `default`, `options`…).
+- Follow the element-first parameter rule in blueprints: do not declare `params` or use `{{key}}` placeholders for page-specific
+  copy inside sections. Declare reusable values on elements, then let each section call `[el-… key="value"]`; create a different
+  section when another band needs different values.
 - `settings` accepts only `brand_color_primary`, `brand_color_secondary`, `brand_color_light`, `brand_color_dark`, `headerHtml` and
   `footerHtml` (`footerHtml`/`headerHtml` are the **site frame**: the blog's header and footer). `language` is a language code, or
   `all` for the colours.

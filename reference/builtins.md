@@ -11,7 +11,8 @@ Every code that draws something also takes `class` (extra CSS classes); it is no
 
 ### Anything that may be used in more than one place is an element
 
-- A **section** (`[sk-...]`) is one band of one page layout, and it takes parameters. An **element** is a piece that can be used anywhere:
+- A **section** (`[sk-...]`) is one band of one page layout. An **element** is a reusable piece that can be used anywhere and owns its
+  parameters. A section supplies those parameter values when it calls `[el-...]`.
   inside several sections, on a page, in a blog post, in a theme layout, or twice on the same page. The built-in `[gl-el-...]` codes below
   are elements, and so are the `[el-...]` ones you create.
 - If a piece may be used somewhere else (a button, a card, a badge, a testimonial, a price box, a call-to-action strip), **make it an
@@ -84,7 +85,7 @@ parameter value (a `<form>` there is stripped).
 | `[gl-logo-icon]` | The favicon, as an image. |
 | `[gl-lang-switcher]` | The language switcher. Draws nothing on a one-language site. |
 | `[gl-locale]` | The current language's link prefix (`fa` on `/fa/…`, empty on the default language). Build links that stay in the visitor's language. |
-| `[gl-menu-<slug>]` | A menu made with `create_menu` / `set_menu_items`: slug `main` is `[gl-menu-main]`. Takes `orientation` (`horizontal`/`vertical`), `mobile` (`collapse`/…), `label` (the nav's accessible name). The place for site-wide links. |
+| `[gl-menu-<slug>]` | A menu made with `create_menu` / `set_menu_items`: slug `main` is `[gl-menu-main]`. Its layout is stored **on the menu** (`orientation`: `horizontal` row with fly-out sub-menus or `vertical` tree; `mobileMode`: `collapse` = a three-bar toggle with the sub-menus as a cascade, `stack`, `keep`) - set it with `create_menu` / `update_menu`, and the shortcode follows it. A placement can still override with `orientation`, `mobile` and `label` (the nav's accessible name). The place for site-wide links. |
 | `[gl-social]` | The social-links panel built from the owner's settings (a link with no value is left out). |
 | `[gl-theme-toggle]` | The dark/light switch. Put it **once**, in the theme layout. |
 | `[gl-map]` | The site’s own location (panel: Settings ▸ Google ▸ Location) as an interactive map, with the address and a directions link under it. Draws nothing until the owner sets a location. | `title`, `height`, `zoom`, `button`, `class` |
