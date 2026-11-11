@@ -127,6 +127,21 @@ and answer engines read. Nobody gains answers by writing markup: the owner adds 
 A question nobody has answered yet appears only to the owner in the panel - so a page with `[gl-faq]` and no answers shows its
 heading and nothing under it. Put `[gl-faq-ask]` below the list, or on a contact page.
 
+## Social feeds (YouTube and Instagram)
+
+The owner connects a YouTube channel or an Instagram Business/Creator account in the panel (**Social feeds**) and presses **Sync now**; the videos, posts and playlists are copied into the
+site, so a page never calls YouTube while it renders. Until the owner has connected and synced, both codes draw a short "nothing to show yet"
+note - do not write video markup by hand, and do not invent playlist names: call `get_social_status` first. It says whether each account is
+connected and synced (and what to ask the owner to press if not) and lists the exact YouTube playlist names and ids to use in `playlist="..."`.
+
+| Code | What it does | Parameters worth knowing |
+|---|---|---|
+| `[gl-youtube]` | The channel's videos as a grid of cards, newest first. Each card links to the video on YouTube; no script and no third-party cookie is on the page. | `limit` (how many, default 6, at most 50), `playlist` (only the videos of one playlist: its name or id; a name that matches none shows nothing), `columns` (1-6, default 3), `title` |
+| `[gl-youtube-playlists]` | The channel's playlists as cards, with the number of videos in each. | `limit` (default 6), `columns` (1-6), `title` |
+| `[gl-instagram]` | The connected Instagram account's newest posts as square tiles; each links to the post on Instagram. | `limit` (default 6, at most 50), `columns` (1-6, default 3), `title` |
+
+To build a page per playlist, use one `[gl-youtube playlist="..."]` per section, and `[gl-youtube-playlists]` as the index.
+
 ## Commerce and plans
 
 Only when the owner has set them up; ask before using.

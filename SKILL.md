@@ -1,7 +1,7 @@
 ---
 name: on4net-site-builder
 description: Build, redesign and edit a website on an ON4NET installation through the ON4NET MCP server - designs, theme layouts, elements, sections, pages, menus, media, blog posts with categories and tags, and data tables for forms. Use whenever the user asks to create or change a site, a page, a theme, a section, a blog or a contact form on ON4NET, or hands you an ON4NET agent key.
-version: 2.3.0
+version: 2.5.0
 ---
 
 # Building a site on ON4NET
@@ -42,6 +42,32 @@ Read this whole file once. Open a reference when you reach its subject:
    section (`get_theme_layout`, `get_section`) to learn the site's markup conventions and copy them.
 3. Say back what you found and what you intend to build, in a few lines, and get a yes for anything large.
 
+### Companion skills (check at session start, use when the task matches)
+
+This guide teaches ON4NET's mechanics. Design and search work is delegated to companion skills. At the start of a session,
+see which of them are available in your skill list, and **use them whenever the task falls in their area**:
+
+| Area | Skill | Use it for |
+|---|---|---|
+| Design | `on4net-design-director` (bundled in `design-director/`) | brand discovery, visual direction, industry presets, animation, before building any theme or section |
+| Design | `ui-ux-pro-max` | palettes, font pairings, UX and accessibility guidelines, style choice |
+| SEO | `claude-seo` (`/seo …`) | technical SEO, content/E-E-A-T, schema, sitemap, hreflang, local SEO, page and site audits |
+| GEO | `geo-seo-claude` (`/geo …`) | AI-search visibility, citability, AI-crawler access, `llms.txt`, brand mentions, GEO score |
+
+Rules:
+
+- **Design first.** For a new site, a redesign, a theme layout or any new section, apply `on4net-design-director` and
+  `ui-ux-pro-max` before writing markup, then build it through ON4NET's sections, elements and theme layouts as this guide says.
+- **SEO and GEO after content exists.** Use `claude-seo` for the SEO side and `geo-seo-claude` for the AI-search side. Where
+  they overlap (schema, technical, content), run both and reconcile; do not duplicate findings.
+- **Their advice is input, not authority.** Anything they suggest still has to be expressed with ON4NET tools and obey section 4
+  (no third-party scripts, fonts or embeds without the owner's approval; fixes land in page SEO fields, sections, elements,
+  `set_google_tags`, menus or media, never in files you cannot reach).
+- **If a companion is missing, do not skip it silently.** Tell the user which one is missing and give the install command from
+  `README.md`. Never run an install script, `curl | bash` or a marketplace add without the user's explicit yes. Until they decide,
+  continue with this guide alone and say which part of the work had no companion support.
+- Companion audits take a public URL. Use the primary address `get_site` lists, and only after the pages are published.
+
 ## 2. The model in one minute
 
 ```
@@ -56,14 +82,16 @@ Section  [sk-code]   one band of a page (hero, features, pricing, testimonials, 
 Element  [el-code]   a small reusable piece (button, card, badge, testimonial, price box…) used inside sections, on pages, in
                      posts and in theme layouts. Same anatomy. ANYTHING THAT MAY BE USED IN MORE THAN ONE PLACE IS AN ELEMENT.
 Built-in [gl-…]      pieces that exist on every site with no creating: logo, menus, language switcher, blog list,
-                     FAQ list and ask-a-question form, the site’s location as a map, data tables, charts, icons, shapes,
-                     headings, buttons.
+                     FAQ list and ask-a-question form, the owner’s YouTube videos and playlists and Instagram posts, the site’s
+                     location as a map, data tables, charts, icons, shapes, headings, buttons.
 Parameters           {{title}} in the markup  ⇄  [sk-hero title="Hello"] on the page. Every parameter has a default.
 Menu                 a small tree of links, shown with [gl-menu-<slug>].
 Media                files in the library; a page points at their url.
 Blog                 posts (HTML) + categories + tags, per language. Drafts until published.
 Data table           a named list of fields; a `<form data-collection="slug">` fills it; owners read the entries.
 FAQ                  questions the owner answered in the panel, drawn by [gl-faq]; [gl-faq-ask] is the visitor's form.
+Social feeds         a YouTube channel and/or an Instagram account the owner connected in the panel and synced; drawn by
+                     [gl-youtube] (videos, filter by playlist), [gl-youtube-playlists] and [gl-instagram]. Ask get_social_status first.
 Panel page           a page with audience: "dashboard" - signed-in customers read it at /dashboard/<slug>; visitors never.
 ```
 
@@ -163,6 +191,7 @@ show the user the diff, then `apply_blueprint`. Use the granular tools for every
 **Orient:** `get_site`, `get_guide`, `list_global_shortcodes`
 **Google:** `get_google_status` (the site's own verified `domain`, and whether the Analytics tag, the Search Console tag and the Business Profile are set) · `set_google_tags` (the GA4 `G-…` id and the Search Console verification value; refused until the site has its own verified domain, and needs the Google scope) · `setup_search_console` (verification, property and sitemap in one call) · `search_console_queries` (the keywords, pages, countries or devices the site is found by) · `setup_analytics` (finds or creates the GA4 property and stream and sets the tag) · `analytics_report` (users, sessions and views by page, source, country, device or day) · `business_reviews` (the Business Profile's newest reviews) · `reply_to_review` and `create_business_post` (both **public**: show the owner the text and get their agreement first). All the Google tools need a key with the **Google** scope
 
+**Social feeds:** `get_social_status` (is YouTube / Instagram connected and synced, how many items, and the YouTube `playlists` to filter by; call it before using `[gl-youtube]`, `[gl-youtube-playlists]` or `[gl-instagram]`. Connecting and syncing need the owner in a browser, so tell them - you cannot do it)
 **Structure:** `list_designs` `get_design` `create_design` `update_design` `delete_design` · `set_site_frame` ·
 `list_theme_layouts` `get_theme_layout` `create_theme_layout` `update_theme_layout` `delete_theme_layout` `audit_theme_colors` · `list_icons` · `list_fonts` (the hosted web fonts: use these, not Google Fonts; see `theme-and-style`)
 **Pieces:** `list_elements` `get_element` `create_element` `update_element` `archive_element` `delete_element` ·

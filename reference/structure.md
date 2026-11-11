@@ -62,6 +62,10 @@ fa: design "Main (fa)"  → pages: home, about, services     theme layout "Main 
   `sameInAllViews` is false. Most pages use one layout everywhere: set `desktopThemeId` only.
 - A page with **no theme layout** is drawn in the platform's **site frame** (see below), not in your design. Always give pages a
   theme layout - copy the one the site's existing pages use.
+- A **section carries its own structured data**: `schema` on `create_section` / `update_section` (stored as `schemaJson`) is a schema.org
+  JSON-LD node, or an array of them, each with an `@type`. The page emits it as `<script type="application/ld+json">` beside the section.
+  Write it only for what the section visibly says (a FAQ band → `FAQPage`, a price band → `Product`/`Offer`), never invented facts; `""` removes it.
+  Invalid JSON or a node without `@type` is refused with a 400.
 - A **section can own a page** (`pageId`) or sit in the shared library (no `pageId`). Library sections are the norm: a page uses
   them by code. Page-owned sections are for a one-off band; they still work by code.
 - `isHome` marks the design's home page (the address `/`). Making a page home through `update_page` demotes the previous one;
